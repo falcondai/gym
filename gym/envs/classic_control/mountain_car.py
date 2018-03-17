@@ -28,6 +28,7 @@ class MountainCarEnv(gym.Env):
         self.action_space = spaces.Discrete(3)
         self.observation_space = spaces.Box(self.low, self.high)
 
+        self.better_init = False
         self._seed()
         self.reset()
 
@@ -52,7 +53,14 @@ class MountainCarEnv(gym.Env):
         return np.array(self.state), reward, done, {}
 
     def _reset(self):
-        self.state = np.array([self.np_random.uniform(low=-0.6, high=-0.4), 0])
+        if not self.better_init:
+            self.state = np.array([self.np_random.uniform(low=-0.6, high=-0.4), 0])
+        else:
+            # Better initial states
+            # position, velocity = self.np_random.uniform(low=self.min_position, high=self.max_position), self.np_random.uniform(low=-self.max_speed, high=self.max_speed)
+            position, velocity = self.np_random.uniform(low=self.min_position, high=self.max_position), 0
+            if (position==self.min_position and velocity<0): velocity = 0
+            self.state = position, velocity
         return np.array(self.state)
 
     def _height(self, xs):
